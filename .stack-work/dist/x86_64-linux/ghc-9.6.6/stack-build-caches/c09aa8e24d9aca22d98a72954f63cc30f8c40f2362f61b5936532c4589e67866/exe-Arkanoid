@@ -1,0 +1,18 @@
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/Arkanoid.cabal:
+  hash: 2c9552ab5231e5de90d15aab213ac2abd3b0dab872abe174fcd3377e0b0ab2bc
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/CHANGELOG.md:
+  hash: 1e465585416d3f17e72ca84ac3861ed58c78f56f4d98eca4f5b54f7c7c33ac59
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/README.md:
+  hash: 658c7964cccd75b4d090178cfe556a43c30886fcb70468ba66c573a973561116
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/src/Engine.hs:
+  hash: b92694bed678992db2214ba3c9564598ad1c2bd54453444005504f7b869987ef
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/src/Invaders.hs:
+  hash: 66997e36bbaf8b45f7d1f3faef8b4fcbb50e52dc1df0738d327784e440d21244
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/src/Main.hs:
+  hash: 203250cdc4359cb3255e60dc57602b729fd63600d6adb994bb078ffb806f00b1
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/src/Player.hs:
+  hash: a44f1404ba4a1cf6abdeb5f0feb98ad623f44f9168407914a779cbc79b10f8b9
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/src/Projectile.hs:
+  hash: 15f80889ccf401a314eb220af27cfa7c4d79864ecd5f7dda03f0db1772fa963d
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/src/Window.hs:
+  hash: 4865e32b134df3bde171a8bb28b370cb514c1c700bf9686f41924c2ec8f8ebfd
