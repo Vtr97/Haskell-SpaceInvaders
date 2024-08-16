@@ -4,7 +4,7 @@ name:                SpaceInvaders
 version:             0.1.0.0
 -- synopsis:
 -- description:
-homepage:            https://github.com/githubuser/Arkanoid#readme
+homepage:            https://github.com/githubuser/SpaceInvaders#readme
 license:             BSD-3-Clause
 license-file:        LICENSE
 author:              Author name here
@@ -15,7 +15,7 @@ build-type:          Simple
 extra-source-files:  README.md
                      CHANGELOG.md
 
-executable Arkanoid
+executable SpaceInvaders
   hs-source-dirs:      src
   main-is:             Main.hs
   default-language:    Haskell2010

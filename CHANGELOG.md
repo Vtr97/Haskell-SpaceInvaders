@@ -1,4 +1,4 @@
-# Changelog for `Arkanoid`
+# Changelog for `SpaceInvaders`
 
 All notable changes to this project will be documented in this file.
 
