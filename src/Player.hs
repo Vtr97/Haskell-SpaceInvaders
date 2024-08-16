@@ -19,12 +19,21 @@ shipHalfHeigth = snd shipSize /2
 shipY :: Float
 shipY =  (-halfHeight) + 30 + (snd shipSize /2)
 -- /
+ship :: Float -> Float -> Picture
+ship = rectangleSolid 
+
+data PlayerInfo = Ship {shipPosition :: Position
+                        ,shipSpeed :: Float
+                        }
+
+
+generatePlayer :: PlayerInfo
+generatePlayer = Ship (0,shipY) 0
 
 -- / Renderização da nave
 drawShip :: Float -> Picture
-drawShip x = translate x shipY $ Color shipColor ship
+drawShip x = translate x shipY $ color shipColor $ ship l a
     where
-        ship = rectangleSolid l a
         (l,a) = shipSize
 -- /
     
