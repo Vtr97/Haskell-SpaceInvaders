@@ -31,14 +31,12 @@ drawShip x = translate x shipY $ Color shipColor ship
 
 -- / Movimentação da nave e detecção de colisão com os limites da janela
 moveShip :: Float -> Float -> Float -> Float
-moveShip sec x vel  | detecaColisaoBorda  x && vel > 0    = x - 1
-                    | detecaColisaoBorda  x && vel < 0    = x + 1
+moveShip sec x vel  | detecaColisaoBorda  x && vel > 0    = x - 5
+                    | detecaColisaoBorda  x && vel < 0    = x + 5
                     |otherwise                            = x'
     where
         x' = x + (vel*sec)
                 
-
-
 bordaEsqColide :: Float -> Bool
 bordaEsqColide x    | x - shipHalfWidth <= - halfWidth = True
                     | otherwise                        = False
@@ -46,7 +44,6 @@ bordaEsqColide x    | x - shipHalfWidth <= - halfWidth = True
 bordaDirColide :: Float -> Bool
 bordaDirColide x    | x + shipHalfWidth >= halfWidth    = True
                     | otherwise                         = False
-
 
 detecaColisaoBorda :: Float -> Bool
 detecaColisaoBorda x =  bordaEsqColide x || bordaDirColide x

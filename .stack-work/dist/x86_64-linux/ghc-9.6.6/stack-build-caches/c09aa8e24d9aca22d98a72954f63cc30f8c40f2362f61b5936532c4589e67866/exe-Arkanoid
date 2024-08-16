@@ -1,18 +1,18 @@
-/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/Arkanoid.cabal:
-  hash: 2c9552ab5231e5de90d15aab213ac2abd3b0dab872abe174fcd3377e0b0ab2bc
-/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/CHANGELOG.md:
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/SpaceInvaders/CHANGELOG.md:
   hash: 1e465585416d3f17e72ca84ac3861ed58c78f56f4d98eca4f5b54f7c7c33ac59
-/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/README.md:
-  hash: 658c7964cccd75b4d090178cfe556a43c30886fcb70468ba66c573a973561116
-/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/src/Engine.hs:
-  hash: b92694bed678992db2214ba3c9564598ad1c2bd54453444005504f7b869987ef
-/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/src/Invaders.hs:
-  hash: 66997e36bbaf8b45f7d1f3faef8b4fcbb50e52dc1df0738d327784e440d21244
-/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/src/Main.hs:
-  hash: 203250cdc4359cb3255e60dc57602b729fd63600d6adb994bb078ffb806f00b1
-/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/src/Player.hs:
-  hash: a44f1404ba4a1cf6abdeb5f0feb98ad623f44f9168407914a779cbc79b10f8b9
-/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/src/Projectile.hs:
-  hash: 15f80889ccf401a314eb220af27cfa7c4d79864ecd5f7dda03f0db1772fa963d
-/home/vitor/UFABC/ProgramacaoFuncional2024.2/Arkanoid/src/Window.hs:
-  hash: 4865e32b134df3bde171a8bb28b370cb514c1c700bf9686f41924c2ec8f8ebfd
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/SpaceInvaders/README.md:
+  hash: ded8cf9e2fdfed2282f520a26c7ac5aba6494aec25f10772f2f9ea908213741f
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/SpaceInvaders/SpaceInvaders.cabal:
+  hash: 0f634c720d915a5da364932490a4e25c7cbbfc4db43037403ead9c149a1f1fec
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/SpaceInvaders/src/Engine.hs:
+  hash: 0f2856c1446e2e4e35180b186e7b5165eb09cd7ba5e92efe784f3e6107e94414
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/SpaceInvaders/src/Invaders.hs:
+  hash: 21a23b19550e77155d721446df41c23b64a88772ea8def1835ac8f3fe920bdcb
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/SpaceInvaders/src/Main.hs:
+  hash: 0fa0aeca3c1100fbaaa84f24b2b44dda452dcef7c28393e2f1bb21200f198d3e
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/SpaceInvaders/src/Player.hs:
+  hash: c1b234e832c0367d78b6f11b7c8fb8d68354be0a793ca4a1b2db58d3efa94cbe
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/SpaceInvaders/src/Projectile.hs:
+  hash: d733460160ce35356e38a5cb068b63aec49b58dff3a56d845a62cdc6616ee495
+/home/vitor/UFABC/ProgramacaoFuncional2024.2/SpaceInvaders/src/Window.hs:
+  hash: 96bfbd47c27eb2b9a5b1ad8daa868392746d32592ddd0a9828b3036e24a9f96f

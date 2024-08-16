@@ -10,10 +10,8 @@ playerProjectileWidth = 8
 playerProjectileHeight :: Float
 playerProjectileHeight =20
 
-
 playerProjectileSize :: (Float,Float)
 playerProjectileSize = (playerProjectileWidth,playerProjectileHeight)
-
 
 --cor do projetil
 playerProjectileColor :: Color
@@ -29,12 +27,12 @@ invaderProjectileSize = (invaderProjectileWidth,invaderProjectileHeight)
 invaderProjectileColor:: Color
 invaderProjectileColor = green
 
-
-
 data ProjectileInfo = PlayerProjectile
-                        {projectilePos :: Position}
+                        {projectilePos :: Position
+                        ,projectileSpeed::Float}
                     | InvaderProjectile
-                        {projectilePos :: Position}
+                        {projectilePos :: Position
+                        ,projectileSpeed::Float}
 
 type Projectiles = [ProjectileInfo]
 
@@ -54,6 +52,11 @@ moveProjectile :: Float -> Position -> Float -> Position
 moveProjectile sec (x,y) vy = (x,y')
     where
         y'= y + vy*sec
+
+playerShoot :: Projectiles -> Float ->Projectiles
+playerShoot proj pX = PlayerProjectile{projectilePos=(pX,shipY),projectileSpeed=300} : proj
+
+
 
 
 ------ / Colisoes de projeteis
