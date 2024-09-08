@@ -1,4 +1,3 @@
-{-# LANGUAGE InstanceSigs #-}
 module Engine where
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
@@ -7,6 +6,7 @@ import Player
 import Invaders
 import Projectile
 import Colisions
+import System.Random
 
 ---- /O tipo GameState guarda os objetos do jogo que fazem parte da classe de tipos GameObject
 ---- esse tipo é usado para realizar o controle do estado do jogo
@@ -66,24 +66,20 @@ instance GameObject PlayerInfo where
 
 instance GameObject InvaderInfo where
     getPosition = invaderPos
-    draw :: InvaderInfo -> Picture
     draw  (Invader{invaderPos=(x,y),invaderColor = col}) = translate x y $  color col $ invader l a
         where
             (l,a) = invaderSize
 ---- Falta definir como os invaders irão se movimentar então por hora eles ficam parados     
-    move s speed inv = if x > rl || x < ll
-        then (x ,y-down)
-        else(x+speed*s,y)
+    move s speed inv = case direction inv of
+        Dir -> (x + speed * s,y)
+        Esq -> (x - speed *s,y)
         where
             (x,y) = getPosition inv
-            ll = -350
-            rl = 350
-            down = 0.5
 
     update sec i = i {invaderPos = moveI}
         where
             moveI = move sec speed i
-            speed = 30
+            speed = 60
 ---- /
 
 --quadros por segundo
@@ -123,13 +119,14 @@ handleInput _ state = state {player = (player state) {shipSpeed = 0}}
 updateObjetcs :: Float -> GameState -> GameState
 updateObjetcs sec state = state{player=updateS,projectiles=updateP,invaders=updateI,gameTimer=updateTime}
     where
+        updateColision = removeColided (invaders state) (projectiles state)
+        (colisionInv,colisionProj) = updateColision
+        updatedInvaders = updateInvadersDirection colisionInv
         updateTime = gameTimer state + sec
         updateS = update sec (player state)
         updateP = map (update sec) colisionProj
-        updateI = map (update sec) colisionInv
-        updateColision = removeColided (invaders state) (projectiles state)
-        (colisionInv,colisionProj) = updateColision
-
+        updateI = map (update sec) updatedInvaders
+    
 
 --A função drawGame renderiza os GameObjects
 drawGame :: GameState -> Picture

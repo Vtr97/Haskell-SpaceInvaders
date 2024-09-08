@@ -1,12 +1,19 @@
 module Invaders where
 import Graphics.Gloss
 import Window
+import System.Random
 
 
 ---- / Propriedades dos invasores
 -- Invasores por fileira
 invaderRow :: Int
 invaderRow = 11
+
+invaderLine ::Int
+invaderLine = 5
+
+totalInvaders :: Int
+totalInvaders = invaderRow * invaderLine
 --Tamanho dos invasores
 invaderSize :: (Float,Float)
 invaderSize = (30, 24)
@@ -18,12 +25,21 @@ ihalfHeight = (1 + snd invaderSize) / 2
 invader :: Float -> Float -> Picture
 invader = rectangleSolid
 
+data Direction = Esq | Dir
+
+instance Eq  Direction where 
+    Esq == Esq = True
+    Dir == Dir = True
+    _ == _ = False
+
+
 ---- / Tipo InvaderInfo que guarda as informações de um invasor
 data InvaderInfo = Invader
     {invaderPos :: Position -- Coordenada do invasor
     ,invaderColor :: Color -- cor do invasor
     ,invaderType :: InvaderType
-    ,invaderId :: Int}  deriving (Eq)
+    ,invaderId :: Int
+    ,direction :: Direction}  deriving (Eq)
 type InvaderType = Int
 ---- \
 
@@ -43,6 +59,7 @@ generateInvader linha coluna = Invader
                                 ,invaderColor = selectColor linha
                                 ,invaderType  = selecType linha
                                 ,invaderId = genId
+                                ,direction = Dir
                                 }
     where 
         genId = linha * 11 + coluna
@@ -58,7 +75,7 @@ selectColor  l  | l == 0 || l == 1 = light blue
 
 -- Função que dado um invader e uma lista de invaders , remove esse invader da lista utilizando seu invaderID
 killInvader :: InvaderInfo -> [InvaderInfo] -> [InvaderInfo]
-killInvader (Invader _ _ _ i) = filter checkId
+killInvader (Invader _ _ _ i _) = filter checkId
     where
         checkId inv= i /= invaderId inv
 
@@ -69,3 +86,10 @@ yPosition :: Int -> Float
 yPosition linha = 50 + fromIntegral (50*linha)
 ---- \
 
+
+chooseRandomInvader :: [ InvaderInfo] -> Maybe InvaderInfo
+chooseRandomInvader[] = Nothing
+
+invertDirection :: Direction -> Direction
+invertDirection Esq = Dir
+invertDirection Dir = Esq

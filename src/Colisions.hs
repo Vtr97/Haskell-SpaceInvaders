@@ -45,7 +45,6 @@ checkColision :: [InvaderInfo] -> [ProjectileInfo] -> [(InvaderInfo,ProjectileIn
 checkColision invs projs = [(inv,proj)| inv <- invs , proj <- projs , invaderColision inv proj]
 
 
-
 removeColided ::  [InvaderInfo] -> [ProjectileInfo] -> ([InvaderInfo],[ProjectileInfo])
 removeColided invs projs = (updatedInvs,updatedProjs)
     where
@@ -54,3 +53,29 @@ removeColided invs projs = (updatedInvs,updatedProjs)
         colidedProjs = map snd colided
         updatedInvs = filter (\inv-> notElem inv colidedInvs) invs
         updatedProjs = filter (\proj->notElem proj colidedProjs) projs
+
+colisaoInvaderBorda :: [InvaderInfo] -> Bool
+colisaoInvaderBorda invs = any colisaoBorda invs
+    where
+        colisaoBorda inv = 
+            let (x,_) = invaderPos inv in
+            case direction inv of
+            Dir -> x >= halfWidth
+            Esq -> x <= -halfWidth
+
+
+
+updateInvadersDirection :: [InvaderInfo] -> [InvaderInfo]
+updateInvadersDirection invaders
+    | colisaoInvaderBorda invaders = map (`setDirection` newDirection) invaders
+    | otherwise = invaders
+  where
+    currentDirection = direction (head invaders)
+    newDirection = case currentDirection of
+        Dir -> Esq
+        Esq  -> Dir
+
+setDirection :: InvaderInfo -> Direction -> InvaderInfo
+setDirection inv newDir = inv { invaderPos=(x,y-30),direction = newDir }
+    where
+        (x,y) = invaderPos inv
