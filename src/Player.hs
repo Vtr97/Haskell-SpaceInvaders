@@ -1,10 +1,17 @@
 module Player where
 import Graphics.Gloss
 import Window
-
+import Graphics.Gloss.Juicy
 ---- / Informações da nave controlada pelo jogador
 --Função que guarda o formato da nave
 ship :: Float -> Float -> Picture
+shipImage :: IO Picture
+shipImage = 
+    loadJuicyPNG "assets/player.png" >>= \maybePic ->
+        case maybePic of
+            Just pic -> return pic
+            Nothing -> error "Não carregou a imagem"
+
 ship = rectangleSolid 
 shipColor :: Color
 shipColor = white

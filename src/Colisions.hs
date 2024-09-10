@@ -45,14 +45,16 @@ checkColision :: [InvaderInfo] -> [ProjectileInfo] -> [(InvaderInfo,ProjectileIn
 checkColision invs projs = [(inv,proj)| inv <- invs , proj <- projs , invaderColision inv proj]
 
 
-removeColided ::  [InvaderInfo] -> [ProjectileInfo] -> ([InvaderInfo],[ProjectileInfo])
-removeColided invs projs = (updatedInvs,updatedProjs)
+removeColided ::  [InvaderInfo] -> [ProjectileInfo] -> ([InvaderInfo],[ProjectileInfo],Float)
+removeColided invs projs = (updatedInvs,updatedProjs,updatedScore)
     where
         colided = checkColision invs projs
         colidedInvs = map fst colided
         colidedProjs = map snd colided
         updatedInvs = filter (\inv-> notElem inv colidedInvs) invs
         updatedProjs = filter (\proj->notElem proj colidedProjs) projs
+        updatedScore = calculateScore colidedInvs
+
 
 colisaoInvaderBorda :: [InvaderInfo] -> Bool
 colisaoInvaderBorda invs = any colisaoBorda invs
@@ -63,19 +65,8 @@ colisaoInvaderBorda invs = any colisaoBorda invs
             Dir -> x >= halfWidth
             Esq -> x <= -halfWidth
 
-
-
-updateInvadersDirection :: [InvaderInfo] -> [InvaderInfo]
-updateInvadersDirection invaders
-    | colisaoInvaderBorda invaders = map (`setDirection` newDirection) invaders
-    | otherwise = invaders
-  where
-    currentDirection = direction (head invaders)
-    newDirection = case currentDirection of
-        Dir -> Esq
-        Esq  -> Dir
-
-setDirection :: InvaderInfo -> Direction -> InvaderInfo
-setDirection inv newDir = inv { invaderPos=(x,y-30),direction = newDir }
+calculateScore :: [InvaderInfo] -> Float
+calculateScore invs = foldl(\acc inv->acc+invaderScore inv) 0 invs
     where
-        (x,y) = invaderPos inv
+        invaderScore inv = fromIntegral (invaderType inv * 100)
+         

@@ -50,3 +50,16 @@ janela :: Display
 janela = InWindow "Space Invaders" (width,height) (offset,offset)
 
 
+drawMenu :: Picture
+drawMenu = pictures 
+    [ translate (-150) 100 $ scale 0.6 0.6 $ color white $ text "Jogar"   
+    , translate (-150) (-100) $ scale 0.6 0.6 $ color white $ text "Sair"
+    ]
+
+
+drawScore :: Float -> Picture
+drawScore score = translate x y $ scale 0.3 0.3 $ color white $ text ("Score: " ++ show (round score))
+  where
+    x = -halfWidth + 20  -- Desloca o texto para o canto esquerdo da tela
+    y = halfHeight - 50  -- Desloca o texto para o topo da tela
+   

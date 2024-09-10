@@ -4,6 +4,7 @@ import Window
 import System.Random
 
 
+
 ---- / Propriedades dos invasores
 -- Invasores por fileira
 invaderRow :: Int
@@ -63,7 +64,7 @@ generateInvader linha coluna = Invader
                                 }
     where 
         genId = linha * 11 + coluna
-        selecType l     | l == 0 || l == 1 = 0
+        selecType l     | l == 0 || l == 1 = 1
                         | otherwise = l
 
 --regra que seleciona a cor do invader baseado na linha em que ele está
@@ -93,3 +94,4 @@ chooseRandomInvader[] = Nothing
 invertDirection :: Direction -> Direction
 invertDirection Esq = Dir
 invertDirection Dir = Esq
+
