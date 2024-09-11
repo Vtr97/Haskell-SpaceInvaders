@@ -60,6 +60,11 @@ drawMenu = pictures
 drawScore :: Float -> Picture
 drawScore score = translate x y $ scale 0.3 0.3 $ color white $ text ("Score: " ++ show (round score))
   where
-    x = -halfWidth + 20  -- Desloca o texto para o canto esquerdo da tela
-    y = halfHeight - 50  -- Desloca o texto para o topo da tela
+    x = -halfWidth + 20  
+    y = halfHeight - 50  
    
+drawLife :: Int -> Picture
+drawLife life = translate x y $ scale 0.2 0.2 $ color white $ text ("Vidas: " ++ show life)
+  where
+    x = halfWidth - 150
+    y = halfHeight - 50 

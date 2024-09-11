@@ -22,7 +22,6 @@ loadAssets = do
     }
 
 
-
 data GameMode = Menu Int| Playing | Exit deriving Eq
 ---- /O tipo GameState guarda os objetos do jogo que fazem parte da classe de tipos GameObject
 ---- esse tipo é usado para realizar o controle do estado do jogo
@@ -34,6 +33,7 @@ data GameState = GameState
     , gameTimer     :: Float      
     , lastShotTime  :: Float      
     , score         :: Float
+    ,playerLife     :: Int
     }
 
 ---- \
@@ -132,6 +132,7 @@ defaultState = GameState
     , gameTimer = 0
     , lastShotTime = -shootDelay   -- Permitir que o jogador possa atirar imediatamente
     , score = 0
+    , playerLife = 3
     }
 
 
@@ -199,10 +200,11 @@ drawGame :: GameState -> Picture
 
 drawGame state = case gameMode state of
     Menu _ -> drawMenu
-    Playing->pictures [drawS, drawI, drawP, pontos]
+    Playing->pictures [drawS, drawI, drawP, pontos,vida]
     Exit ->blank
     where
         drawP =  pictures $ map draw (projectiles state)
         drawI = pictures $ map draw (invaders state)
         drawS = draw (player state)
         pontos = drawScore(score state)
+        vida = drawLife(playerLife state)
