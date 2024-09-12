@@ -47,7 +47,6 @@ projectile = rectangleSolid
 --- Note que essa função está implementada de maneira que funciona apenas para o jogador pois ainda não implementei a funcionalidade de atirar para o inimigo
 shoot :: [ProjectileInfo] -> Float ->[ProjectileInfo]
 shoot proj pX = PlayerProjectile{projectilePos=(pX,shipY),projectileSpeed=300} : proj
-
 ---- \
 
 

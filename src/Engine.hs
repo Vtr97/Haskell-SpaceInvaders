@@ -7,23 +7,37 @@ import Invaders
 import Projectile
 import Colisions
 import System.Random
+import Control.Monad.State
 
 
+---- O tipo gameAssets guarda as imagens do jogo
 data GameAssets = GameAssets
   { shipAsset :: Picture
+  , greenAsset :: Picture
+  , redAsset :: Picture
+  , yellowAsset :: Picture
   }
 
+---- Load Assets é usada no contexto de IO () do main para carregar os assets do jogo
 loadAssets :: IO GameAssets
 loadAssets = do
   shipA <- shipImage
+  greenI <- grennInvader
+  redI <- redInvader
+  yellowI <- yellowInvader
   return $ GameAssets
     { shipAsset = shipA
-
+    ,greenAsset = greenI
+    ,redAsset = redI
+    ,yellowAsset = yellowI
     }
 
 
+--- o tipó GameMode é usado para definir os diferentes estados do jogo
 data GameMode = Menu Int| Playing | Exit deriving Eq
----- /O tipo GameState guarda os objetos do jogo que fazem parte da classe de tipos GameObject
+
+
+---- /O tipo GameState guarda os objetos do jogo que fazem parte da classe de tipos GameObject e outras informações relevantes de controle
 ---- esse tipo é usado para realizar o controle do estado do jogo
 data GameState = GameState
     { gameMode      :: GameMode
@@ -38,13 +52,16 @@ data GameState = GameState
 
 ---- \
 
+--- o tipo jogo define a monada de estado do GameState
+type Jogo a = State GameState a
+
 
 
 ---- / Os tipos que serão renderizados no jogo e tem capacidade de se mover foram inseridos em uma classe de tipos GameObject 
 class GameObject a where
     getPosition :: a -> Position
     move :: Float -> Float -> a -> Position
-    draw :: a -> Picture
+    draw :: GameAssets -> a -> Picture
     update :: Float -> a -> a
 ---- \
 
@@ -55,10 +72,10 @@ instance GameObject ProjectileInfo where
         where
             y' = y + s * sec
             (x,y) = projectilePos proj
-    draw (PlayerProjectile (x,y) _) = translate x y $ color playerProjectileColor $ projectile pw ph
+    draw _ (PlayerProjectile (x,y) _)  = translate x y $ color playerProjectileColor $ projectile pw ph
         where
             (pw,ph) = playerProjectileSize
-    draw (InvaderProjectile (x,y)_) = translate x y $ color invaderProjectileColor $ projectile iw ih
+    draw _ (InvaderProjectile (x,y)_) = translate x y $ color invaderProjectileColor $ projectile iw ih
         where (iw,ih) = invaderProjectileSize
     update sec proj = proj {projectilePos= moveProj}
         where
@@ -76,9 +93,7 @@ instance GameObject PlayerInfo where
 
 
 
-    draw (Ship (x,y)_) = translate x y $ color shipColor $ ship l a
-        where
-            (l,a) = shipSize
+    draw asset (Ship (x,y)_)  = translate x y $ shipAsset asset
     update sec s = s {shipPosition = moveS}
         where
             moveS = move sec speed s
@@ -86,9 +101,13 @@ instance GameObject PlayerInfo where
 
 instance GameObject InvaderInfo where
     getPosition = invaderPos
-    draw  (Invader{invaderPos=(x,y),invaderColor = col}) = translate x y $  color col $ invader l a
-        where
-            (l,a) = invaderSize
+    draw asset (Invader{invaderPos=(x,y),invaderType=t}) = 
+        case t of
+            0 -> translate x y $  greenAsset asset
+            1 -> translate x y $  greenAsset asset
+            2 -> translate x y $  redAsset asset
+            3 -> translate x y $  redAsset asset
+            4 -> translate x y $  yellowAsset asset
 
     move s speed inv = case direction inv of
         Dir -> (x + speed * s,y)
@@ -101,9 +120,10 @@ instance GameObject InvaderInfo where
             moveI = move sec speed i
             speed = 60
 
+--- Essa função é usada para detectar se algum invader colidiu com a borda , se sim ela inverte a direção de todos os invaders
 updateInvadersDirection :: [InvaderInfo] -> [InvaderInfo]
 updateInvadersDirection invs
-    | colisaoInvaderBorda invs = map (`setDirection` newDirection) invs
+    | colisaoInvaderBorda invs = map (setDirection newDirection) invs
     | otherwise = invs
   where
     currentDirection = direction (head invs)
@@ -111,8 +131,9 @@ updateInvadersDirection invs
         Dir -> Esq
         Esq  -> Dir
 
-setDirection :: InvaderInfo -> Direction -> InvaderInfo
-setDirection inv newDir = inv { invaderPos=(x,y-30),direction = newDir }
+---- A função setDirection muda a direção de um invader
+setDirection ::Direction -> InvaderInfo -> InvaderInfo
+setDirection newDir inv = inv { invaderPos=(x,y-30),direction = newDir }
     where
         (x,y) = invaderPos inv
 
@@ -130,48 +151,47 @@ defaultState = GameState
     , player = generatePlayer
     , projectiles = []
     , gameTimer = 0
-    , lastShotTime = -shootDelay   -- Permitir que o jogador possa atirar imediatamente
+    , lastShotTime = -shootDelay   
     , score = 0
     , playerLife = 3
     }
 
 
---Função que lida com os inputs do jogador
-{- handleInput :: Event -> GameState -> GameState
-handleInput (EventKey (SpecialKey KeyLeft) Down _ _) state  |gameMode state == Menu  = state
-                                                            |gameMode state == Playing = state {player = (player state) {shipSpeed = -200}}
-handleInput (EventKey (SpecialKey KeyRight) Down _ _) state |gameMode state == Menu = state
-                                                            |gameMode state == Playing = state {player = (player state) {shipSpeed = 200}}
-
-handleInput (EventKey (Char 'z') Down _ _) state    | canShoot = state { projectiles = shoot (projectiles state) shipX
-                                                                    ,lastShotTime = gameTimer state}
-                                                    | otherwise = state
-    where
-        shipX = fst $ getPosition (player state)
-        canShoot = (gameTimer state - lastShotTime state) >= shootDelay
-handleInput _ state = state {player = (player state) {shipSpeed = 0}} -}
 
 
+handleInputState :: Event -> Jogo GameState
+handleInputState (EventKey (SpecialKey KeyLeft) Down _ _)= do
+    gs <- get 
+    case gameMode gs of
+        (Menu x) -> put gs {gameMode = updateMenu (-1) (Menu x)}
+        Playing  -> put gs {player = (player gs) {shipSpeed = -200}}
+    return gs
 
+handleInputState (EventKey (SpecialKey KeyRight) Down _ _) = do
+    gs <- get
+    case gameMode gs of
+        (Menu x) -> put gs {gameMode=updateMenu (-1) (Menu x)} 
+        Playing -> put gs {player = (player gs) {shipSpeed = 200}}
+    return gs
 
-handleInput2::Event ->GameState -> GameState
-handleInput2 (EventKey (SpecialKey KeyLeft) Down _ _) state  = case gameMode state of
-    (Menu x) -> state {gameMode=updateMenu (-1) (Menu x)}
-    Playing -> state {player = (player state) {shipSpeed = -200}}
-handleInput2 (EventKey (SpecialKey KeyRight) Down _ _) state  = case gameMode state of
-    (Menu x) -> state {gameMode=updateMenu (-1) (Menu x)} 
-    Playing -> state {player = (player state) {shipSpeed = 200}}                                                    
+handleInputState (EventKey (Char 'z') Down _ _) = do
+    gs <- get
+    let shipX = fst $ getPosition (player gs)
+        canShoot = (gameTimer gs - lastShotTime gs) >= shootDelay
+        in
+            if canShoot then do
+                put gs  { projectiles = shoot (projectiles gs) shipX
+                        ,lastShotTime = gameTimer gs}
+                return gs
+            else
+                return gs
 
-handleInput2 (EventKey (Char 'z') Down _ _) state    | canShoot = state { projectiles = shoot (projectiles state) shipX
-                                                                    ,lastShotTime = gameTimer state}
-                                                | otherwise = state
-    where
-        shipX = fst $ getPosition (player state)
-        canShoot = (gameTimer state - lastShotTime state) >= shootDelay
-
-handleInput2 _ state = state {player = (player state) {shipSpeed = 0}}
-
-
+handleInputState _  = do
+    gs <- get
+    put gs {player = (player gs) {shipSpeed = 0}}
+    return gs
+   
+ 
 
 updateMenu :: Int -> GameMode -> GameMode
 updateMenu i (Menu op) | op+i > limit = Menu 0
@@ -179,32 +199,34 @@ updateMenu i (Menu op) | op+i > limit = Menu 0
     where
         limit = 1
 
--- o Gloss fornece o tempo em segundos quando usamos a função play!!!
 
---a função updateObjects atualiza a posição do estado do jogo a cada segundo
-updateObjetcs :: Float -> GameState -> GameState
-updateObjetcs sec state = state{player=updateS,projectiles=updateP,invaders=updateI,gameTimer=updateTime,score = updateScore}
+updateObjectsState :: Float -> Jogo GameState
+updateObjectsState sec = state atualizaObjetos
     where
-        updateColision = removeColided (invaders state) (projectiles state)
-        (colisionInv,colisionProj,scr) = updateColision
-        updatedDirection = updateInvadersDirection colisionInv
-        updateTime = gameTimer state + sec
-        updateS = update sec (player state)
-        updateP = map (update sec) colisionProj
-        updateI = map (update sec) updatedDirection
-        updateScore = score state + scr
+        atualizaObjetos :: GameState -> (GameState,GameState)
+        atualizaObjetos gameState = let 
+            updateColision = removeColided (invaders gameState) (projectiles gameState)
+            (colisionInv,colisionProj,scr) = updateColision
+            updatedDirection = updateInvadersDirection colisionInv
+            updateTime = gameTimer gameState + sec
+            updateS = update sec (player gameState)
+            updateP = map (update sec) colisionProj
+            updateI = map (update sec) updatedDirection
+            updateScore = score gameState + scr in
+            (gameState,gameState{player=updateS,projectiles=updateP,invaders=updateI,gameTimer=updateTime,score = updateScore})
 
 
---A função drawGame renderiza os GameObjects
-drawGame :: GameState -> Picture
-
-drawGame state = case gameMode state of
-    Menu _ -> drawMenu
-    Playing->pictures [drawS, drawI, drawP, pontos,vida]
-    Exit ->blank
+drawGameState :: GameAssets ->Jogo Picture
+drawGameState assets = state desenhaJogo
     where
-        drawP =  pictures $ map draw (projectiles state)
-        drawI = pictures $ map draw (invaders state)
-        drawS = draw (player state)
-        pontos = drawScore(score state)
-        vida = drawLife(playerLife state)
+        desenhaJogo :: GameState -> (Picture,GameState)
+        desenhaJogo gameState = let
+            drawP =  pictures $ map (draw assets) (projectiles gameState)
+            drawI = pictures $ map (draw assets) (invaders gameState)
+            drawS = draw assets (player gameState)
+            pontos = drawScore(score gameState)
+            vida = drawLife(playerLife gameState) in
+                case gameMode gameState of
+                    Menu _ -> (drawMenu,gameState)
+                    Playing->(pictures [drawS, drawI, drawP, pontos,vida],gameState)
+                    Exit ->(blank,gameState)

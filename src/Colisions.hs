@@ -45,6 +45,7 @@ checkColision :: [InvaderInfo] -> [ProjectileInfo] -> [(InvaderInfo,ProjectileIn
 checkColision invs projs = [(inv,proj)| inv <- invs , proj <- projs , invaderColision inv proj]
 
 
+---- função que dada uma lista de invaders e projectiles , checa colisão entre eles e então remove eles da lista , também devolve um float que indica a pontuação obtida após derrotar os invaders
 removeColided ::  [InvaderInfo] -> [ProjectileInfo] -> ([InvaderInfo],[ProjectileInfo],Float)
 removeColided invs projs = (updatedInvs,updatedProjs,updatedScore)
     where
@@ -56,6 +57,7 @@ removeColided invs projs = (updatedInvs,updatedProjs,updatedScore)
         updatedScore = calculateScore colidedInvs
 
 
+---- função para detectar se algum invader colidiu com a borda
 colisaoInvaderBorda :: [InvaderInfo] -> Bool
 colisaoInvaderBorda invs = any colisaoBorda invs
     where
@@ -65,6 +67,7 @@ colisaoInvaderBorda invs = any colisaoBorda invs
             Dir -> x >= halfWidth
             Esq -> x <= -halfWidth
 
+---- função para calcular a pontuação do jogador após um projetil do jogador colidir com um invader
 calculateScore :: [InvaderInfo] -> Float
 calculateScore invs = foldl(\acc inv->acc+invaderScore inv) 0 invs
     where

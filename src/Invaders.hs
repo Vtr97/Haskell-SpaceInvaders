@@ -2,8 +2,32 @@ module Invaders where
 import Graphics.Gloss
 import Window
 import System.Random
+import Graphics.Gloss.Juicy
 
 
+---- / Funções que carregam as imagens dos invaders
+grennInvader :: IO Picture
+grennInvader = 
+    loadJuicyPNG "assets/green.png" >>= \maybePic ->
+        case maybePic of
+            Just pic -> return pic
+            Nothing -> error "Não carregou a imagem"
+
+redInvader :: IO Picture
+redInvader = 
+    loadJuicyPNG "assets/red.png" >>= \maybePic ->
+        case maybePic of
+            Just pic -> return pic
+            Nothing -> error "Não carregou a imagem"
+
+yellowInvader :: IO Picture
+yellowInvader = 
+    loadJuicyPNG "assets/yellow.png" >>= \maybePic ->
+        case maybePic of
+            Just pic -> return pic
+            Nothing -> error "Não carregou a imagem"
+
+---- /
 
 ---- / Propriedades dos invasores
 -- Invasores por fileira
@@ -26,6 +50,10 @@ ihalfHeight = (1 + snd invaderSize) / 2
 invader :: Float -> Float -> Picture
 invader = rectangleSolid
 
+---- \
+
+
+---- / direction é usado para auxiliar no movimento dos invaders
 data Direction = Esq | Dir
 
 instance Eq  Direction where 
@@ -33,11 +61,11 @@ instance Eq  Direction where
     Dir == Dir = True
     _ == _ = False
 
+---- \
 
 ---- / Tipo InvaderInfo que guarda as informações de um invasor
 data InvaderInfo = Invader
     {invaderPos :: Position -- Coordenada do invasor
-    ,invaderColor :: Color -- cor do invasor
     ,invaderType :: InvaderType
     ,invaderId :: Int
     ,direction :: Direction}  deriving (Eq)
@@ -57,7 +85,6 @@ generateInvaders = [generateInvader l c| l <-[0..4], c <- [0..10]]
 generateInvader :: Int -> Int -> InvaderInfo
 generateInvader linha coluna = Invader
                                 {invaderPos = (xPosition coluna, yPosition linha)
-                                ,invaderColor = selectColor linha
                                 ,invaderType  = selecType linha
                                 ,invaderId = genId
                                 ,direction = Dir
@@ -67,19 +94,12 @@ generateInvader linha coluna = Invader
         selecType l     | l == 0 || l == 1 = 1
                         | otherwise = l
 
---regra que seleciona a cor do invader baseado na linha em que ele está
-selectColor :: Int -> Color
-selectColor  l  | l == 0 || l == 1 = light blue
-                | l == 2 = green
-                | l == 3 = cyan
-                | l == 4 = orange
 
 -- Função que dado um invader e uma lista de invaders , remove esse invader da lista utilizando seu invaderID
 killInvader :: InvaderInfo -> [InvaderInfo] -> [InvaderInfo]
-killInvader (Invader _ _ _ i _) = filter checkId
+killInvader (Invader{invaderId=i}) = filter checkId
     where
-        checkId inv= i /= invaderId inv
-
+        checkId inv = i /= invaderId inv
 ---- / Essas funções definem a logica da distribuição dos invaders na janela do jogo
 xPosition :: Int -> Float
 xPosition coluna = (-275) + fromIntegral (50*coluna)
@@ -87,11 +107,15 @@ yPosition :: Int -> Float
 yPosition linha = 50 + fromIntegral (50*linha)
 ---- \
 
+---- / Função auxiliar que inverte a direção 
+invertDirection :: Direction -> Direction
+invertDirection Esq = Dir
+invertDirection Dir = Esq
+---- \
+
 
 chooseRandomInvader :: [ InvaderInfo] -> Maybe InvaderInfo
 chooseRandomInvader[] = Nothing
 
-invertDirection :: Direction -> Direction
-invertDirection Esq = Dir
-invertDirection Dir = Esq
+
 

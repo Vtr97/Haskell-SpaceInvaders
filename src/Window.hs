@@ -48,23 +48,30 @@ bordas = pictures [bordaEsq, bordaDir, bordaCima , bordaInf ]
 ---- /Cria a janela do jogo utilizando o tipo Display da biblioteca gloss
 janela :: Display
 janela = InWindow "Space Invaders" (width,height) (offset,offset)
+---- \
 
-
+---- /Desenha o menu principal
 drawMenu :: Picture
 drawMenu = pictures 
     [ translate (-150) 100 $ scale 0.6 0.6 $ color white $ text "Jogar"   
     , translate (-150) (-100) $ scale 0.6 0.6 $ color white $ text "Sair"
     ]
+---- \
 
+---- / Desenham a UI do jogo
 
+-- desenha os pontos
 drawScore :: Float -> Picture
 drawScore score = translate x y $ scale 0.3 0.3 $ color white $ text ("Score: " ++ show (round score))
   where
     x = -halfWidth + 20  
     y = halfHeight - 50  
-   
+
+ -- desenha a quantidade de vidas do jogador  
 drawLife :: Int -> Picture
 drawLife life = translate x y $ scale 0.2 0.2 $ color white $ text ("Vidas: " ++ show life)
   where
     x = halfWidth - 150
     y = halfHeight - 50 
+    
+---- \
