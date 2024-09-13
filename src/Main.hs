@@ -15,7 +15,6 @@ import Control.Monad.State
 ---- A função Main utiliza a função play do Gloss para renderizar a janela do jogo e então desenha os objetos do jogo e os atualiza a cada segundo
 main :: IO ()
 main = do
-    let initialState = defaultState
     assets <- loadAssets
-    play janela background refreshRate initialState (evalState $ drawGameState assets) handleInputState  updateObjectsState
+    play janela background refreshRate defaultState (evalState $ drawGameState assets) (execState.handleInputState ) (execState.updateObjectsState)
 

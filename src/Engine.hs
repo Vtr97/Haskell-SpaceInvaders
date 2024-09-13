@@ -159,20 +159,20 @@ defaultState = GameState
 
 
 
-handleInputState :: Event -> Jogo GameState
+handleInputState :: Event -> Jogo ()
 handleInputState (EventKey (SpecialKey KeyLeft) Down _ _)= do
     gs <- get 
     case gameMode gs of
         (Menu x) -> put gs {gameMode = updateMenu (-1) (Menu x)}
         Playing  -> put gs {player = (player gs) {shipSpeed = -200}}
-    return gs
+    
 
 handleInputState (EventKey (SpecialKey KeyRight) Down _ _) = do
     gs <- get
     case gameMode gs of
         (Menu x) -> put gs {gameMode=updateMenu (-1) (Menu x)} 
         Playing -> put gs {player = (player gs) {shipSpeed = 200}}
-    return gs
+    
 
 handleInputState (EventKey (Char 'z') Down _ _) = do
     gs <- get
@@ -182,14 +182,13 @@ handleInputState (EventKey (Char 'z') Down _ _) = do
             if canShoot then do
                 put gs  { projectiles = shoot (projectiles gs) shipX
                         ,lastShotTime = gameTimer gs}
-                return gs
             else
-                return gs
+                return ()
 
 handleInputState _  = do
     gs <- get
     put gs {player = (player gs) {shipSpeed = 0}}
-    return gs
+
    
  
 
@@ -200,33 +199,33 @@ updateMenu i (Menu op) | op+i > limit = Menu 0
         limit = 1
 
 
-updateObjectsState :: Float -> Jogo GameState
-updateObjectsState sec = state atualizaObjetos
-    where
-        atualizaObjetos :: GameState -> (GameState,GameState)
-        atualizaObjetos gameState = let 
-            updateColision = removeColided (invaders gameState) (projectiles gameState)
-            (colisionInv,colisionProj,scr) = updateColision
-            updatedDirection = updateInvadersDirection colisionInv
-            updateTime = gameTimer gameState + sec
-            updateS = update sec (player gameState)
-            updateP = map (update sec) colisionProj
-            updateI = map (update sec) updatedDirection
-            updateScore = score gameState + scr in
-            (gameState,gameState{player=updateS,projectiles=updateP,invaders=updateI,gameTimer=updateTime,score = updateScore})
+updateObjectsState :: Float -> Jogo ()
+updateObjectsState sec = do
+    gs <- get
+    let 
+        updateColision = removeColided (invaders gs) (projectiles gs)
+        (colisionInv,colisionProj,scr) = updateColision
+        updatedDirection = updateInvadersDirection colisionInv
+        updateTime = gameTimer gs + sec
+        updateS = update sec (player gs)
+        updateP = map (update sec) colisionProj
+        updateI = map (update sec) updatedDirection
+        updateScore = score gs + scr 
+        in
+            put gs{player=updateS,projectiles=updateP,invaders=updateI,gameTimer=updateTime,score = updateScore}
 
 
 drawGameState :: GameAssets ->Jogo Picture
-drawGameState assets = state desenhaJogo
-    where
-        desenhaJogo :: GameState -> (Picture,GameState)
-        desenhaJogo gameState = let
-            drawP =  pictures $ map (draw assets) (projectiles gameState)
-            drawI = pictures $ map (draw assets) (invaders gameState)
-            drawS = draw assets (player gameState)
-            pontos = drawScore(score gameState)
-            vida = drawLife(playerLife gameState) in
-                case gameMode gameState of
-                    Menu _ -> (drawMenu,gameState)
-                    Playing->(pictures [drawS, drawI, drawP, pontos,vida],gameState)
-                    Exit ->(blank,gameState)
+drawGameState assets = do
+    gs <- get
+    let
+        drawP =  pictures $ map (draw assets) (projectiles gs)
+        drawI = pictures $ map (draw assets) (invaders gs)
+        drawS = draw assets (player gs)
+        pontos = drawScore(score gs)
+        vida = drawLife(playerLife gs) 
+        in
+            case gameMode gs of
+                Menu _ -> return drawMenu
+                Playing -> return (pictures [drawS, drawI, drawP, pontos,vida])
+                Exit -> return blank
