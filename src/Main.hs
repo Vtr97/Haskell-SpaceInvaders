@@ -16,5 +16,5 @@ import Control.Monad.State
 main :: IO ()
 main = do
     assets <- loadAssets
-    play janela background refreshRate defaultState (evalState $ drawGameState assets) (execState.handleInputState ) (execState.updateObjectsState)
+    play janela background refreshRate defaultState (evalState $ drawGameState assets) (\event-> execState (handleInputState event) ) (\time -> execState (updateObjectsState time))
 
