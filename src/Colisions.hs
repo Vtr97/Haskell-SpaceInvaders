@@ -39,33 +39,52 @@ playerColision shipX (InvaderProjectile{projectilePos=(x,y)}) = overlapX && over
         overlapX = overlap (shipX-shipHalfWidth,shipX+shipHalfWidth) (x-(invaderProjectileWidth/2),x+(invaderProjectileWidth/2))
         overlapY = overlap (shipY-shipHalfHeigth,shipY+shipHalfHeigth) (y-(invaderProjectileHeight/2),y+(invaderProjectileHeight/2))
 
+playerColided :: Float -> [ProjectileInfo] -> Bool
+playerColided shipX projs = any (playerColision shipX) projs
 
 --- dado uma lista de invaders e projetils , retorna duplas de (projetil,invader) que colidiram
-checkColision :: [InvaderInfo] -> [ProjectileInfo] -> [(InvaderInfo,ProjectileInfo)]
-checkColision invs projs = [(inv,proj)| inv <- invs , proj <- projs , invaderColision inv proj]
+checkColision :: [InvaderInfo] -> [ProjectileInfo] -> [(InvaderInfo, ProjectileInfo)]
+checkColision  invs projs = 
+    [(inv, proj) | inv <- invs, proj <- projs, isPlayerProjectile proj, invaderColision inv proj]
 
+
+-- Função auxiliar para verificar se o projétil é do tipo PlayerProjectile
+isPlayerProjectile :: ProjectileInfo -> Bool
+isPlayerProjectile (PlayerProjectile _ _) = True
+isPlayerProjectile _ = False
 
 ---- função que dada uma lista de invaders e projectiles , checa colisão entre eles e então remove eles da lista , também devolve um float que indica a pontuação obtida após derrotar os invaders
-removeColided ::  [InvaderInfo] -> [ProjectileInfo] -> ([InvaderInfo],[ProjectileInfo],Float)
-removeColided invs projs = (updatedInvs,updatedProjs,updatedScore)
+removeColided ::  Position-> [InvaderInfo] -> [ProjectileInfo] -> ([InvaderInfo],[ProjectileInfo],Float,Bool)
+removeColided pos invs projs = (updatedInvs,updatedProjs,updatedScore,playerColide)
     where
-        colided = checkColision invs projs
+        colided = checkColision  invs projs
         colidedInvs = map fst colided
         colidedProjs = map snd colided
+        playerColide  =  playerColided (fst pos) projs
         updatedInvs = filter (\inv-> notElem inv colidedInvs) invs
         updatedProjs = filter (\proj->notElem proj colidedProjs) projs
         updatedScore = calculateScore colidedInvs
 
 
----- função para detectar se algum invader colidiu com a borda
-colisaoInvaderBorda :: [InvaderInfo] -> Bool
-colisaoInvaderBorda invs = any colisaoBorda invs
+---- função para detectar se algum invader colidiu com a borda lateral , utilizado para auziliar na movimentação dos invaders
+colisaoInvaderBordaLateral :: [InvaderInfo] -> Bool
+colisaoInvaderBordaLateral invs = any colisaoBorda invs
     where
         colisaoBorda inv = 
             let (x,_) = invaderPos inv in
             case direction inv of
             Dir -> x >= halfWidth
             Esq -> x <= -halfWidth
+
+---- Função para detectar se algum invader invadiu o eixo Y do jogador , o que resulta em Game Over
+colisaoInvaderPlayerY :: [InvaderInfo] -> Bool
+colisaoInvaderPlayerY invs = any colisaoBorda invs
+    where
+        colisaoBorda inv = 
+            let 
+                (_,iy) = invaderPos inv
+            in
+                iy <= shipY       
 
 ---- função para calcular a pontuação do jogador após um projetil do jogador colidir com um invader
 calculateScore :: [InvaderInfo] -> Float

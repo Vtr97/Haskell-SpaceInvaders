@@ -51,15 +51,41 @@ janela = InWindow "Space Invaders" (width,height) (offset,offset)
 ---- \
 
 ---- /Desenha o menu principal
-drawMenu :: Picture
-drawMenu = pictures 
-    [ translate (-150) 100 $ scale 0.6 0.6 $ color white $ text "Jogar"   
-    , translate (-150) (-100) $ scale 0.6 0.6 $ color white $ text "Sair"
+drawMenu :: Int -> Picture
+drawMenu selected = pictures
+    [ drawSelected 1 "Jogar"
     ]
+  where
+    drawSelected op textOp = 
+      translate (-150) (-100 + 100 * fromIntegral op) $
+      scale 0.6 0.6 $ 
+      color (if op == selected then yellow else white) $ 
+      text textOp
+      
 ---- \
 
----- / Desenham a UI do jogo
+---- / Desenha o Menu de Game Over
+drawGameOver :: Int -> Picture
+drawGameOver selected = pictures
+    [ drawTitle "Game Over"   
+    , drawSelected 1 "Restart"
+    ]
+  where
+    drawTitle title = 
+      translate (-300) 200 $  
+      scale 0.8 0.8 $       
+      color red $            
+      text title
 
+    drawSelected op textOp = 
+      translate (-100) (-100 - 50 * fromIntegral op) $ 
+      scale 0.6 0.6 $ 
+      color (if op == selected then yellow else white) $ 
+      text textOp
+---- \
+
+
+---- / Desenham a UI do jogo
 -- desenha os pontos
 drawScore :: Float -> Picture
 drawScore score = translate x y $ scale 0.3 0.3 $ color white $ text ("Score: " ++ show (round score))

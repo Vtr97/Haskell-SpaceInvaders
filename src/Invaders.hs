@@ -3,30 +3,30 @@ import Graphics.Gloss
 import Window
 import System.Random
 import Graphics.Gloss.Juicy
-
+import Data.List 
+import Data.Function(on)
 
 ---- / Funções que carregam as imagens dos invaders
 grennInvader :: IO Picture
-grennInvader = 
+grennInvader =
     loadJuicyPNG "assets/green.png" >>= \maybePic ->
         case maybePic of
             Just pic -> return pic
             Nothing -> error "Não carregou a imagem"
 
 redInvader :: IO Picture
-redInvader = 
+redInvader =
     loadJuicyPNG "assets/red.png" >>= \maybePic ->
         case maybePic of
             Just pic -> return pic
             Nothing -> error "Não carregou a imagem"
 
 yellowInvader :: IO Picture
-yellowInvader = 
+yellowInvader =
     loadJuicyPNG "assets/yellow.png" >>= \maybePic ->
         case maybePic of
             Just pic -> return pic
             Nothing -> error "Não carregou a imagem"
-
 ---- /
 
 ---- / Propriedades dos invasores
@@ -50,13 +50,16 @@ ihalfHeight = (1 + snd invaderSize) / 2
 invader :: Float -> Float -> Picture
 invader = rectangleSolid
 
+invaderShotDelay :: Float
+invaderShotDelay = 1.6
+
 ---- \
 
 
 ---- / direction é usado para auxiliar no movimento dos invaders
 data Direction = Esq | Dir
 
-instance Eq  Direction where 
+instance Eq  Direction where
     Esq == Esq = True
     Dir == Dir = True
     _ == _ = False
@@ -67,10 +70,15 @@ instance Eq  Direction where
 data InvaderInfo = Invader
     {invaderPos :: Position -- Coordenada do invasor
     ,invaderType :: InvaderType
+    ,invaderLinha :: Int
+    ,invaderColuna :: Int
     ,invaderId :: Int
     ,direction :: Direction}  deriving (Eq)
 type InvaderType = Int
 ---- \
+
+instance Show InvaderInfo where
+    show inv = "Linha: " ++ show (invaderLinha inv)
 
 ---- / Invasores tem tamanho (30,24) e vamos distribuir 5 linhas de 11 invasores com um espaçamento em x = 20  e
 -- espaçamento em y = 26 portanto eles ocuparão (30+20)*11 = 550 pixels em x e (24+26)*5 = 250 pixels em Y
@@ -85,11 +93,13 @@ generateInvaders = [generateInvader l c| l <-[0..4], c <- [0..10]]
 generateInvader :: Int -> Int -> InvaderInfo
 generateInvader linha coluna = Invader
                                 {invaderPos = (xPosition coluna, yPosition linha)
+                                , invaderLinha = linha
+                                , invaderColuna = coluna
                                 ,invaderType  = selecType linha
                                 ,invaderId = genId
                                 ,direction = Dir
                                 }
-    where 
+    where
         genId = linha * 11 + coluna
         selecType l     | l == 0 || l == 1 = 1
                         | otherwise = l
@@ -114,8 +124,26 @@ invertDirection Dir = Esq
 ---- \
 
 
-chooseRandomInvader :: [ InvaderInfo] -> Maybe InvaderInfo
-chooseRandomInvader[] = Nothing
+--- Função auxiliar que compara os invaders por coluna e caso sejam iguais compara por 
+compareInvader :: InvaderInfo -> InvaderInfo -> Ordering
+compareInvader inv1 inv2 =
+    case compare (invaderColuna inv1) (invaderColuna inv2) of
+        EQ -> compare (invaderLinha inv2) (invaderLinha inv1)
+        ord -> ord
 
+-- Função para encontrar o invasor mais baixo em cada coluna que serão utilizador para escolher o invader que irá atirar
+-- Encontrei a solução aqui https://stackoverflow.com/questions/12398458/how-to-group-similar-items-in-a-list-using-haskell
+lastInvaderInColumn :: [InvaderInfo] -> [InvaderInfo]
+lastInvaderInColumn invaders =
+    map last $ groupBy ((==) `on` invaderColuna) sortedInvaders
+  where
+    sortedInvaders = sortBy compareInvader invaders
 
+---- / Função que utiliza uma lista aleatória infinita e uma lista de invaders e busca um invader para atirar e também consome a lista. A lista de InvaderInfo passada é o resultado de lastInvaderInColumn
+getShooterInvader :: [Int] -> [InvaderInfo] ->  (InvaderInfo,[Int])
+getShooterInvader (x:xs) invs =
+    case find (\inv -> invaderId inv == x) invs of
+        Just inv -> (inv,xs)
+        Nothing -> getShooterInvader xs invs
+----- \
 

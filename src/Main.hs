@@ -3,7 +3,7 @@ import Graphics.Gloss
 import Window
 import Projectile
 import Invaders
-import Player 
+import Player
 import Engine
 import Colisions
 import Control.Monad.State
@@ -15,6 +15,8 @@ import Control.Monad.State
 ---- A função Main utiliza a função play do Gloss para renderizar a janela do jogo e então desenha os objetos do jogo e os atualiza a cada segundo
 main :: IO ()
 main = do
+    listarng <- randomInvaderList
     assets <- loadAssets
-    play janela background refreshRate defaultState (evalState $ drawGameState assets) (\event-> execState (handleInputState event) ) (\time -> execState (updateObjectsState time))
+
+    play janela background refreshRate (defaultState listarng) (evalState $ drawGameState assets) (execState . handleInputState ) (execState . updateObjectsState)
 
