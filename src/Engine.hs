@@ -36,7 +36,7 @@ loadAssets = do
 
 
 --- o tipó GameMode é usado para definir os diferentes estados do jogo
-data GameMode = Menu Int| Playing | GameOver Int deriving Eq 
+data GameMode = Menu Int| Playing | GameOver Int | Victory Int deriving Eq 
 
 
 ---- /O tipo GameState guarda os objetos do jogo que fazem parte da classe de tipos GameObject e outras informações relevantes de controle
@@ -203,6 +203,14 @@ handleInvaderShoot = do
     else return ()
 ---- \
 
+handleVictory :: Jogo ()
+handleVictory = do
+    gs <- get
+    let
+        invs = invaders gs
+    case invs of
+        [] -> put gs {gameMode = Victory 1}
+        _ -> return ()
 
 
 ---- / Essa função recebe um Event (aperto de teclas) e retorna uma monada State com o jogo atualizado
@@ -213,6 +221,7 @@ handleInputState (EventKey (SpecialKey KeyLeft) Down _ _)= do
             Menu _  -> return ()
             Playing  -> put gs {player = (player gs) {shipSpeed = -200}}
             GameOver _ -> return ()
+            Victory _  -> return ()
             
 handleInputState (EventKey (SpecialKey KeyRight) Down _ _) = do
     gs <- get
@@ -220,13 +229,15 @@ handleInputState (EventKey (SpecialKey KeyRight) Down _ _) = do
             Menu _ ->  return ()
             Playing ->  put gs {player = (player gs) {shipSpeed = 200}}
             GameOver _ -> return ()
-            
+            Victory _ -> return ()
+
 handleInputState (EventKey (SpecialKey KeyUp) Down _ _)= do
     gs <- get
     case gameMode gs of
             Menu _ -> updateMenuState 1
             Playing  -> return ()
             GameOver _ -> updateMenuState 1
+            Victory _ -> updateMenuState 1
             
 handleInputState (EventKey (SpecialKey KeyDown) Down _ _) = do
     gs <- get
@@ -234,6 +245,7 @@ handleInputState (EventKey (SpecialKey KeyDown) Down _ _) = do
             Menu _ -> updateMenuState (-1)
             Playing  -> return ()
             GameOver _ -> updateMenuState (-1)
+            Victory _ -> updateMenuState (-1)
             
 handleInputState (EventKey (Char 'z') Down _ _) = do
     modify $ \gs ->
@@ -246,12 +258,15 @@ handleInputState (EventKey (Char 'z') Down _ _) = do
                                     ,lastShipShotTime = gameTimer gs}
                             else
                                 gs
-                Menu x -> if    x == 1 then
+                Menu x ->   if    x == 1 then
                                     defaultPlayState $ aleatorios gs
-                        else gs
-                GameOver x -> if x == 1 then
+                            else gs
+                GameOver x ->   if x == 1 then
                                     defaultPlayState $ aleatorios gs
-                        else gs
+                                else gs
+                Victory x ->    if x == 1 then
+                                    defaultPlayState $ aleatorios gs
+                                else gs
 
 handleInputState _  = do
     modify $ \gs ->
@@ -271,6 +286,7 @@ handlePlayerDeath = do
                      else
                         return ()
             GameOver _ -> return ()
+            Victory _ -> return ()
 ---- \
 
 
@@ -281,6 +297,7 @@ updateMenuState i = do
     case gameMode gs of
         Menu op ->     put gs{gameMode=updateMenu Menu op}
         GameOver op -> put gs{gameMode=updateMenu GameOver op}
+        Victory op -> put gs{gameMode=updateMenu Victory op}
         _ -> return ()
     where
         updateMenu gm op    | op+i > limit = gm 1
@@ -320,9 +337,9 @@ updateObjectsState sec = do
                              , invaders = updateInvaders
                              , gameTimer = updateTime
                              , score = updateScore }
-            handleInvaderShoot >> handlePlayerDeath
-            return ()
+            handleInvaderShoot >> handlePlayerDeath >> handleVictory
         GameOver _ -> return ()
+        Victory _ -> return ()
         
 ---- \
 
@@ -342,5 +359,6 @@ drawGameState assets = do
                 Menu x -> return$ drawMenu x
                 Playing -> return (pictures [drawS, drawI, drawP, pontos,vida])
                 GameOver x -> return $ drawGameOver x
+                Victory x -> return $ drawVictory x
 ------ \
 
