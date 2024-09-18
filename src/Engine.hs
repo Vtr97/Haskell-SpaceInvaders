@@ -203,6 +203,8 @@ handleInvaderShoot = do
     else return ()
 ---- \
 
+
+---- / Monada state que lida com a condição de vitória do jogo , retorna () pois apenas atualiza o estado
 handleVictory :: Jogo ()
 handleVictory = do
     gs <- get
@@ -212,6 +214,7 @@ handleVictory = do
         [] -> put gs {gameMode = Victory 1}
         _ -> return ()
 
+---- \
 
 ---- / Essa função recebe um Event (aperto de teclas) e retorna uma monada State com o jogo atualizado
 handleInputState :: Event -> Jogo ()

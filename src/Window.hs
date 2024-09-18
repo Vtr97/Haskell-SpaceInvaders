@@ -50,6 +50,7 @@ janela :: Display
 janela = InWindow "Space Invaders" (width,height) (offset,offset)
 ---- \
 
+--- /Funções auxiliares para desenhar os menus do jogo
 drawTitle :: String -> Picture
 drawTitle title =
   translate (-300) 200 $  
@@ -64,6 +65,7 @@ drawSelected op textOp selected=
   color (if op == selected then yellow else white) $ 
   text textOp
 
+---- \
 ---- /Desenha o menu principal
 drawMenu :: Int -> Picture
 drawMenu selected = pictures
