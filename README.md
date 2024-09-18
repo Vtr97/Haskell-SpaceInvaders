@@ -30,7 +30,7 @@ stack run
 
 ## Instruções de Controle
 - **Setas Esquerda e Direita**: Movimentar o jogador.
-- **Tecla "z"**: Atirar.
+- **Tecla "z"**: Atirar/Selecionar Opção do Menu.
 
 
 

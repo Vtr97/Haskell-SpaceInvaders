@@ -124,14 +124,14 @@ invertDirection Dir = Esq
 ---- \
 
 
---- Função auxiliar que compara os invaders por coluna e caso sejam iguais compara por 
+--- Função auxiliar que compara os invaders por coluna e caso sejam iguais compara por linhas
 compareInvader :: InvaderInfo -> InvaderInfo -> Ordering
 compareInvader inv1 inv2 =
     case compare (invaderColuna inv1) (invaderColuna inv2) of
         EQ -> compare (invaderLinha inv2) (invaderLinha inv1)
         ord -> ord
 
--- Função para encontrar o invasor mais baixo em cada coluna que serão utilizador para escolher o invader que irá atirar
+-- Função para encontrar o invasor mais baixo em cada coluna que serão utilizados para escolher o invader que irá atirar
 -- Encontrei a solução aqui https://stackoverflow.com/questions/12398458/how-to-group-similar-items-in-a-list-using-haskell
 lastInvaderInColumn :: [InvaderInfo] -> [InvaderInfo]
 lastInvaderInColumn invaders =
